@@ -1,0 +1,40 @@
+name: GitHub Actions Sample
+
+# GitHub上でワークフローを手動実行できるようにする
+on: workflow_dispatch
+
+jobs:
+    test:
+        name: Run TestFramework
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                lfs: true
+
+            # Test
+            - name: Run Tests
+              uses: game-ci/unity-test-runner@v4
+              env:
+                UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+                UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+                UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+              with:
+                # secrets.GITHUB_TOKENは自動生成されるので自身で設定する必要はない
+                githubToken: ${{ secrets.GITHUB_TOKEN }}
+                # Unity プロジェクトのバージョンを指定する(ProjectSettings/ProjectVersion.txt に記載されているバージョンを入力)
+                unityVersion: 2021.3.0f1
+                # TestするModeを指定する
+                testMode: editmode
+
+            # Test結果をアップロードする (デフォルトでは Test Framwork は結果を artifacts という名前のフォルダに出力)
+            - name: Upload Test Results
+              uses: actions/upload-artifact@v3
+              if: always()
+              with:
+                name: Test results
+                path: artifacts
+              
+              
