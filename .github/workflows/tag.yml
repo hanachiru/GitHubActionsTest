@@ -1,0 +1,32 @@
+name: Tag And Release Sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: choice
+        required: true
+        description: 'Semantic Versioning'
+        default: 'patch'
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+    tag:
+      name: Attach Tag
+      runs-on: ubuntu-latest
+      steps:
+        # Checkout
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            lfs: true
+
+        # Print inputs
+        - name: Print inputs
+          run: |
+            echo "${VERSION_DATA}"
+          env:
+            VERSION_DATA: ${{ github.event.inputs.version }}
